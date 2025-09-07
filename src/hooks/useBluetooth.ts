@@ -47,7 +47,7 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
 
     return devices;
   } catch (error) {
-    console.error("Failed to parse bluetooth data:", error);
+    // The error is caught and displayed in the UI, so no need to log here.
     throw new Error("Could not parse JSON from system_profiler");
   }
 };
