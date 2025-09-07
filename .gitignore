@@ -5,7 +5,16 @@
 
 # build
 /dist
+build/
+.next/
+out/
+coverage/
+*.log
+raycast-env.d.ts
+/test
 
 # misc
 .DS_Store
-.aider*
+..idea/
+.vscode/
+aider*
