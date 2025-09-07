@@ -1,7 +1,8 @@
 import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
-import * as blueutil from "blueutil";
+import { exec } from "child_process";
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
+import { isBlueutilInstalled } from "./utils";
 
 const getDeviceIcon = (minorType: string): Icon => {
   switch (minorType.toLowerCase()) {
@@ -21,6 +22,12 @@ const getDeviceIcon = (minorType: string): Icon => {
 };
 
 export default function Command() {
+  const [isBlueutilInstalled, setIsBlueutilInstalled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    isBlueutilInstalled().then(setIsBlueutilInstalled);
+  }, []);
+
   const { devices, error, isLoading, revalidate } = useBluetooth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -53,24 +60,44 @@ export default function Command() {
     });
 
     try {
-      if (isConnected) {
-        await blueutil.disconnect(address);
-      } else {
-        await blueutil.connect(address);
-      }
+      const action = isConnected ? "disconnect" : "connect";
+      exec(`blueutil --${action} ${address}`, (error, stdout, stderr) => {
+        if (error || stderr) {
+          toast.style = Toast.Style.Failure;
+          toast.title = "Failed to toggle connection";
+          toast.message = stderr || error?.message;
+          return;
+        }
 
-      toast.style = Toast.Style.Success;
-      toast.title = "Connection toggled";
+        toast.style = Toast.Style.Success;
+        toast.title = "Connection toggled";
 
-      // Refresh the list after a short delay to allow the connection state to update
-      setTimeout(() => {
-        revalidate();
-      }, 1000);
+        // Refresh the list after a short delay to allow the connection state to update
+        setTimeout(() => {
+          revalidate();
+        }, 1000);
+      });
     } catch (err) {
       toast.style = Toast.Style.Failure;
       toast.title = "Error";
       toast.message = err instanceof Error ? err.message : "Unknown error";
     }
+  }
+
+  if (isBlueutilInstalled === null) {
+    return <List isLoading={true} />;
+  }
+
+  if (isBlueutilInstalled === false) {
+    return (
+      <List>
+        <List.EmptyView
+          title="blueutil Not Found"
+          description="Please install it with Homebrew (brew install blueutil) and ensure it's in your PATH."
+          icon={Icon.Warning}
+        />
+      </List>
+    );
   }
 
   return (
