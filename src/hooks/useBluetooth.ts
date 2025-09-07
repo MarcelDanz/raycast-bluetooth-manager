@@ -11,6 +11,7 @@ interface SystemProfilerOutput {
 }
 
 interface DeviceInfo {
+  device_name?: string;
   device_minorType: string;
   device_isconnected: "Yes" | "No";
   device_address: string;
@@ -37,11 +38,11 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
 
     allDeviceLists
       .flatMap((deviceObject) => Object.entries(deviceObject))
-      .forEach(([name, info]) => {
+      .forEach(([nameFromKey, info]) => {
         // Use device address as a more reliable key to avoid duplicates
         if (info.device_address && !deviceMap.has(info.device_address)) {
           deviceMap.set(info.device_address, {
-            name: name,
+            name: info.device_name || nameFromKey,
             address: info.device_address,
             connected: info.device_isconnected === "Yes",
             minorType: info.device_minorType,
@@ -72,7 +73,14 @@ export function useBluetooth() {
           throw err;
         }
 
+        console.log("--- Raw system_profiler output ---");
+        console.log(stdout);
+
         const parsedDevices = parseOutput(stdout);
+
+        console.log("--- Parsed devices ---");
+        console.log(parsedDevices);
+
         setDevices(parsedDevices);
       } catch (e) {
         setError(e as Error);
