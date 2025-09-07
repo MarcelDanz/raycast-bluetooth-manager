@@ -1,6 +1,3 @@
-# People Directory
-
-An easy way to explore your company employees. Get started [here](https://www.raycast.com/templates/people-directory).
 # Bluetooth Manager for Raycast
 
 A Raycast extension to quickly connect and disconnect your Bluetooth devices directly from the Raycast command bar.
