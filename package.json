@@ -16,11 +16,7 @@
     },
     {
       "path": "metadata/screenshot-2.png",
-      "caption": "Connect or disconnect with a single action"
-    },
-    {
-      "path": "metadata/screenshot-3.png",
-      "caption": "Guidance to install blueutil if missing"
+      "caption": "Search through your devices"
     }
   ],
   "commands": [
