@@ -22,10 +22,10 @@ const getDeviceIcon = (minorType: string): Icon => {
 };
 
 export default function Command() {
-  const [isBlueutilInstalled, setIsBlueutilInstalled] = useState<boolean | null>(null);
+  const [isInstalled, setIsInstalled] = useState<boolean | null>(null);
 
   useEffect(() => {
-    isBlueutilInstalled().then(setIsBlueutilInstalled);
+    isBlueutilInstalled().then(setIsInstalled);
   }, []);
 
   const { devices, error, isLoading, revalidate } = useBluetooth();
@@ -84,11 +84,11 @@ export default function Command() {
     }
   }
 
-  if (isBlueutilInstalled === null) {
+  if (isInstalled === null) {
     return <List isLoading={true} />;
   }
 
-  if (isBlueutilInstalled === false) {
+  if (isInstalled === false) {
     return (
       <List>
         <List.EmptyView
