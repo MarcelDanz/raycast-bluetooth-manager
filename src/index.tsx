@@ -2,7 +2,7 @@ import { Action, ActionPanel, Icon, List, showToast, Toast } from "@raycast/api"
 import { useBluetooth } from "./hooks/useBluetooth";
 
 export default function Command() {
-  const { devices, isLoading, revalidate } = useBluetooth();
+  const { devices, error, isLoading, revalidate } = useBluetooth();
 
   async function handleToggleConnection(deviceName: string) {
     const toast = await showToast({
@@ -38,6 +38,11 @@ export default function Command() {
 
   return (
     <List isLoading={isLoading}>
+      <List.EmptyView
+        title={error ? "Could not fetch devices" : "No devices found"}
+        description={error ? error.message : "Press ⌘+R to refresh."}
+        icon={error ? Icon.XMarkCircle : Icon.Bluetooth}
+      />
       {devices.map((device) => (
         <List.Item
           key={device.address}

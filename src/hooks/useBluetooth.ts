@@ -30,8 +30,8 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
       .sort((a, b) => a.name.localeCompare(b.name));
   } catch (error) {
     console.error("Failed to parse bluetooth data:", error);
-    // Return empty array on parsing error
-    return [];
+    // Rethrow to be caught by the caller
+    throw new Error("Could not parse JSON from system_profiler");
   }
 };
 
@@ -45,15 +45,20 @@ export function useBluetooth() {
     setError(null);
 
     exec("system_profiler SPBluetoothDataType -json", (err, stdout) => {
-      if (err) {
-        setError(err);
-        setIsLoading(false);
-        return;
-      }
+      try {
+        if (err) {
+          throw err;
+        }
 
-      const parsedDevices = parseOutput(stdout);
-      setDevices(parsedDevices);
-      setIsLoading(false);
+        const parsedDevices = parseOutput(stdout);
+        setDevices(parsedDevices);
+      } catch (e) {
+        setError(e as Error);
+        // Clear devices on error
+        setDevices([]);
+      } finally {
+        setIsLoading(false);
+      }
     });
   }, []);
 
