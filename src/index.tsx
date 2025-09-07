@@ -67,9 +67,11 @@ export default function Command() {
       return;
     }
 
+    const actionVerb = isConnected ? "Disconnecting" : "Connecting";
+
     const toast = await showToast({
       style: Toast.Style.Animated,
-      title: "Toggling connection...",
+      title: `${actionVerb}...`,
     });
 
     try {
@@ -77,13 +79,13 @@ export default function Command() {
       exec(`"${blueutilPath}" --${action} ${address}`, (error, stdout, stderr) => {
         if (error || stderr) {
           toast.style = Toast.Style.Failure;
-          toast.title = "Failed to toggle connection";
+          toast.title = `Failed to ${action}`;
           toast.message = stderr || error?.message;
           return;
         }
 
         toast.style = Toast.Style.Success;
-        toast.title = "Connection toggled";
+        toast.title = `${actionVerb.replace("ing", "ed")}`;
 
         // Refresh the list after a short delay to allow the connection state to update
         setTimeout(() => {
