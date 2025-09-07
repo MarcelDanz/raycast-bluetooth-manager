@@ -15,3 +15,8 @@ To use this extension, you must have [Homebrew](https://brew.sh/) installed. The
 - **Toggle Connection**: Connect or disconnect any device with a single action (`↵`).
 - **Smart Ranking**: Raycast automatically learns which devices you use most and ranks them higher in the list.
 - **Keyboard Navigation**: Use `Cmd`+`Ctrl`+`J` and `Cmd`+`Ctrl`+`K` to navigate the list.
+
+## Attributions
+
+The application icons were created by [icon_small - Flaticon](https://www.flaticon.com/free-icons/bluetooth). 
+
