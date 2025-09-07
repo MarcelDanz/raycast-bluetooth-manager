@@ -56,10 +56,11 @@ export default function Command() {
       const scriptPath = join(environment.assetsPath, "toggle_connection.applescript");
       const { exec } = require("child_process");
       exec(`osascript "${scriptPath}" "${deviceName}"`, (error, stdout, stderr) => {
-        if (error || stderr) {
+        const scriptOutput = stdout.trim();
+        if (error || stderr || scriptOutput.toLowerCase().startsWith("error")) {
           toast.style = Toast.Style.Failure;
           toast.title = "Failed to toggle connection";
-          toast.message = stderr || error?.message;
+          toast.message = stderr || scriptOutput || error?.message;
           return;
         }
 

@@ -17,19 +17,22 @@ on run argv
 				# Wait for the menu to appear
 				delay 0.5
 				
-				# The device name might be a submenu
+				# Find the menu item for the device.
 				set deviceMenuItem to menu item deviceName of menu 1 of btMenuBarItem
 				
-				if exists menu item "Disconnect" of deviceMenuItem then
-					click menu item "Disconnect" of deviceMenuItem
-				else if exists menu item "Connect" of deviceMenuItem then
-					click menu item "Connect" of deviceMenuItem
+				# Most devices have a submenu with actions.
+				if exists (menu 1 of deviceMenuItem) then
+					if exists (menu item "Disconnect" of menu 1 of deviceMenuItem) then
+						click menu item "Disconnect" of menu 1 of deviceMenuItem
+					else if exists (menu item "Connect" of menu 1 of deviceMenuItem) then
+						click menu item "Connect" of menu 1 of deviceMenuItem
+					else
+						click btMenuBarItem -- Close menu
+						return "Error: Found device but no Connect/Disconnect action."
+					end if
 				else
-					# If neither is found, the device might not be connectable
-					# or the action is in a submenu. This handles simple cases.
-					# Close the menu
-					click btMenuBarItem
-					return "Error: Could not find Connect/Disconnect action for " & deviceName
+					# For simpler devices, clicking the item itself might toggle connection.
+					click deviceMenuItem
 				end if
 				
 			end tell
