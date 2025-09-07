@@ -95,8 +95,11 @@ export default function Command() {
           key={device.address}
           id={device.address}
           title={device.name}
-          icon={getDeviceIcon(device.minorType)}
-          accessories={[{ icon: device.connected ? { source: Icon.Checkmark, tintColor: "raycast-green" } : { source: Icon.XMark } }]}
+          icon={
+            device.connected
+              ? { source: getDeviceIcon(device.minorType), tintColor: "raycast-green" }
+              : getDeviceIcon(device.minorType)
+          }
           actions={
             <ActionPanel>
               <Action
