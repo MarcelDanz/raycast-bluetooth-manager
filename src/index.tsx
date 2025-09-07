@@ -2,6 +2,23 @@ import { Action, ActionPanel, Icon, List, showToast, Toast } from "@raycast/api"
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
 
+const getDeviceIcon = (minorType: string): Icon => {
+  switch (minorType.toLowerCase()) {
+    case "keyboard":
+      return Icon.Keyboard;
+    case "mouse":
+      return Icon.Mouse;
+    case "headset":
+    case "headphones":
+    case "earbuds":
+      return Icon.Headphones;
+    case "gamepad":
+      return Icon.GameController;
+    default:
+      return Icon.Bluetooth;
+  }
+};
+
 export default function Command() {
   const { devices, error, isLoading, revalidate } = useBluetooth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -78,8 +95,8 @@ export default function Command() {
           key={device.address}
           id={device.address}
           title={device.name}
-          subtitle={device.minorType}
-          icon={device.connected ? { source: Icon.Checkmark, tintColor: "raycast-green" } : Icon.XMark}
+          icon={getDeviceIcon(device.minorType)}
+          accessories={[{ icon: device.connected ? { source: Icon.Checkmark, tintColor: "raycast-green" } : Icon.XMark }]}
           actions={
             <ActionPanel>
               <Action
@@ -92,7 +109,7 @@ export default function Command() {
                 title="Select Previous Item"
                 icon={Icon.ChevronUp}
                 onAction={selectPreviousItem}
-                shortcut={{ modifiers: ["cmd"], key: "k" }}
+                shortcut={{ modifiers: ["cmd"], key: "h" }}
               />
               <Action
                 title="Select Next Item"
