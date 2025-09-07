@@ -46,21 +46,22 @@ export default function Command() {
     }
   };
 
-  async function handleToggleConnection(deviceName: string) {
+  async function handleToggleConnection(address: string, isConnected: boolean) {
     const toast = await showToast({
       style: Toast.Style.Animated,
       title: "Toggling connection...",
     });
 
     try {
-      const scriptPath = join(environment.assetsPath, "toggle_connection.applescript");
+      const blueutilPath = join(environment.assetsPath, "blueutil");
+      const action = isConnected ? "--disconnect" : "--connect";
       const { exec } = require("child_process");
-      exec(`osascript "${scriptPath}" "${deviceName}"`, (error, stdout, stderr) => {
-        const scriptOutput = stdout.trim();
-        if (error || stderr || scriptOutput.toLowerCase().startsWith("error")) {
+
+      exec(`"${blueutilPath}" ${action} ${address}`, (error, stdout, stderr) => {
+        if (error || stderr) {
           toast.style = Toast.Style.Failure;
           toast.title = "Failed to toggle connection";
-          toast.message = stderr || scriptOutput || error?.message;
+          toast.message = stderr || error?.message;
           return;
         }
 
@@ -102,7 +103,7 @@ export default function Command() {
             <ActionPanel>
               <Action
                 title={device.connected ? "Disconnect" : "Connect"}
-                onAction={() => handleToggleConnection(device.name)}
+                onAction={() => handleToggleConnection(device.address, device.connected)}
               />
               <Action title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["cmd"], key: "r" }} />
               <Action
