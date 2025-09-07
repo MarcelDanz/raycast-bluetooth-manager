@@ -1,8 +1,32 @@
 import { Action, ActionPanel, Icon, List, showToast, Toast } from "@raycast/api";
+import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
 
 export default function Command() {
   const { devices, error, isLoading, revalidate } = useBluetooth();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (devices.length > 0 && !selectedId) {
+      setSelectedId(devices[0].address);
+    }
+  }, [devices]);
+
+  const selectNextItem = () => {
+    if (!selectedId) return;
+    const currentIndex = devices.findIndex((d) => d.address === selectedId);
+    if (currentIndex < devices.length - 1) {
+      setSelectedId(devices[currentIndex + 1].address);
+    }
+  };
+
+  const selectPreviousItem = () => {
+    if (!selectedId) return;
+    const currentIndex = devices.findIndex((d) => d.address === selectedId);
+    if (currentIndex > 0) {
+      setSelectedId(devices[currentIndex - 1].address);
+    }
+  };
 
   async function handleToggleConnection(deviceName: string) {
     const toast = await showToast({
@@ -37,7 +61,13 @@ export default function Command() {
   }
 
   return (
-    <List isLoading={isLoading}>
+    <List
+      isLoading={isLoading}
+      selectedItemId={selectedId}
+      onSelectionChange={(id) => {
+        id && setSelectedId(id);
+      }}
+    >
       <List.EmptyView
         title={error ? "Could not fetch devices" : "No devices found"}
         description={error ? error.message : "Press ⌘+R to refresh."}
@@ -46,6 +76,7 @@ export default function Command() {
       {devices.map((device) => (
         <List.Item
           key={device.address}
+          id={device.address}
           title={device.name}
           subtitle={device.minorType}
           icon={device.connected ? { source: Icon.Checkmark, tintColor: "raycast-green" } : Icon.XMark}
@@ -57,6 +88,18 @@ export default function Command() {
                 shortcut={{ modifiers: ["cmd"], key: "enter" }}
               />
               <Action title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["cmd"], key: "r" }} />
+              <Action
+                title="Select Previous Item"
+                icon={Icon.ChevronUp}
+                onAction={selectPreviousItem}
+                shortcut={{ modifiers: ["cmd"], key: "k" }}
+              />
+              <Action
+                title="Select Next Item"
+                icon={Icon.ChevronDown}
+                onAction={selectNextItem}
+                shortcut={{ modifiers: ["cmd"], key: "j" }}
+              />
             </ActionPanel>
           }
         />
