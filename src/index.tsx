@@ -38,20 +38,10 @@ export default function Command() {
   };
 
   const selectPreviousItem = () => {
-    console.log("selectPreviousItem triggered");
-    if (!selectedId) {
-      console.log("No selectedId, returning");
-      return;
-    }
-    console.log("Current selectedId:", selectedId);
+    if (!selectedId) return;
     const currentIndex = devices.findIndex((d) => d.address === selectedId);
-    console.log("Current index:", currentIndex);
     if (currentIndex > 0) {
-      const newSelectedId = devices[currentIndex - 1].address;
-      console.log("Setting new selectedId:", newSelectedId);
-      setSelectedId(newSelectedId);
-    } else {
-      console.log("Already at the top of the list");
+      setSelectedId(devices[currentIndex - 1].address);
     }
   };
 

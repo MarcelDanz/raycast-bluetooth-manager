@@ -22,33 +22,33 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
     const bluetoothInfo = data.SPBluetoothDataType[0];
     if (!bluetoothInfo) return [];
 
-    // Collect all devices from various possible keys
-    const allDeviceLists: Record<string, DeviceInfo>[] = [
-      ...(bluetoothInfo.device_connected || []),
-      ...(bluetoothInfo.device_not_connected || []),
-    ];
-
-    if (allDeviceLists.length === 0) {
-      return [];
-    }
-
     const deviceMap = new Map<string, BluetoothDevice>();
 
-    allDeviceLists
-      .flatMap((deviceObject) => Object.entries(deviceObject))
-      .forEach(([nameFromKey, info]) => {
-        // Use device address as a more reliable key to avoid duplicates
-        if (info.device_address && !deviceMap.has(info.device_address)) {
-          deviceMap.set(info.device_address, {
-            name: info.device_name || nameFromKey,
-            address: info.device_address,
-            connected: info.device_isconnected === "Yes",
-            minorType: info.device_minorType,
-          });
-        }
-      });
+    const processDeviceList = (list: Record<string, DeviceInfo>[] | undefined, connected: boolean) => {
+      if (!list) return;
+      list
+        .flatMap((deviceObject) => Object.entries(deviceObject))
+        .forEach(([nameFromKey, info]) => {
+          if (info.device_address && !deviceMap.has(info.device_address)) {
+            deviceMap.set(info.device_address, {
+              name: info.device_name || nameFromKey,
+              address: info.device_address,
+              connected: connected,
+              minorType: info.device_minorType,
+            });
+          }
+        });
+    };
 
-    return Array.from(deviceMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    processDeviceList(bluetoothInfo.device_connected, true);
+    processDeviceList(bluetoothInfo.device_not_connected, false);
+
+    const devices = Array.from(deviceMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+
+    console.log("Found connected devices:", devices.filter((d) => d.connected).length);
+    console.log("Found disconnected devices:", devices.filter((d) => !d.connected).length);
+
+    return devices;
   } catch (error) {
     console.error("Failed to parse bluetooth data:", error);
     // Rethrow to be caught by the caller
