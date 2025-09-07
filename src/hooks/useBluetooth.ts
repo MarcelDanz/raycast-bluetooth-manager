@@ -4,7 +4,7 @@ import { BluetoothDevice } from "../types";
 
 interface SystemProfilerOutput {
   SPBluetoothDataType: {
-    devices_list: Record<string, DeviceInfo>;
+    devices_list: Record<string, DeviceInfo>[];
   }[];
 }
 
@@ -18,9 +18,10 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
   try {
     const data = JSON.parse(jsonOutput) as SystemProfilerOutput;
     const deviceList = data.SPBluetoothDataType[0]?.devices_list;
-    if (!deviceList) return [];
+    if (!deviceList || !Array.isArray(deviceList)) return [];
 
-    return Object.entries(deviceList)
+    return deviceList
+      .flatMap((deviceObject) => Object.entries(deviceObject))
       .map(([name, info]) => ({
         name: name,
         address: info.device_address,
