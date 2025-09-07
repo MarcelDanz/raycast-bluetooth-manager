@@ -3,6 +3,23 @@ import * as blueutil from "blueutil";
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
 
+const getDeviceIcon = (minorType: string): Icon => {
+  switch (minorType.toLowerCase()) {
+    case "keyboard":
+      return Icon.Keyboard;
+    case "mouse":
+      return Icon.Mouse;
+    case "headset":
+    case "headphones":
+    case "earbuds":
+      return Icon.Headphones;
+    case "gamepad":
+      return Icon.GameController;
+    default:
+      return Icon.Bluetooth;
+  }
+};
+
 export default function Command() {
   const { devices, error, isLoading, revalidate } = useBluetooth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -74,7 +91,7 @@ export default function Command() {
           key={device.address}
           id={device.address}
           title={device.name}
-          icon={{ source: Icon.Bluetooth, tintColor: !device.connected ? Color.SecondaryText : undefined }}
+          icon={{ source: getDeviceIcon(device.minorType), tintColor: !device.connected ? Color.SecondaryText : undefined }}
           actions={
             <ActionPanel>
               <Action
