@@ -4,7 +4,7 @@
   "title": "Bluetooth Manager",
   "description": "Connect and disconnect bluetooth devices.",
   "icon": "icon.png",
-  "author": "thomas",
+  "author": "MarcelDanz",
   "categories": [
     "System"
   ],
@@ -32,7 +32,7 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.40.0",
+    "@raycast/api": "^1.77.0",
     "@raycast/utils": "^1.4.8"
   },
   "devDependencies": {

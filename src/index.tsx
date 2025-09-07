@@ -125,7 +125,7 @@ export default function Command() {
   return (
     <List
       isLoading={isLoading}
-      selectedItemId={selectedId}
+      selectedItemId={selectedId || undefined}
       onSelectionChange={(id) => {
         id && setSelectedId(id);
       }}
