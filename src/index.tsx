@@ -118,13 +118,13 @@ export default function Command() {
                 title="Select Previous Item"
                 icon={Icon.ChevronUp}
                 onAction={selectPreviousItem}
-                shortcut={{ modifiers: ["ctrl"], key: "h" }}
+                shortcut={{ modifiers: ["cmd", "ctrl"], key: "k" }}
               />
               <Action
                 title="Select Next Item"
                 icon={Icon.ChevronDown}
                 onAction={selectNextItem}
-                shortcut={{ modifiers: ["cmd"], key: "j" }}
+                shortcut={{ modifiers: ["cmd", "ctrl"], key: "j" }}
               />
             </ActionPanel>
           }
