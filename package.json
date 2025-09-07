@@ -3,7 +3,7 @@
   "name": "bluetooth-manager",
   "title": "Bluetooth Manager",
   "description": "Connect and disconnect bluetooth devices.",
-  "icon": "icon.png",
+  "icon": "bluetooth.png",
   "author": "MarcelDanz",
   "categories": [
     "System"
