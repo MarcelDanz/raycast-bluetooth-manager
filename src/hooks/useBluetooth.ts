@@ -12,7 +12,7 @@ interface SystemProfilerOutput {
 interface DeviceInfo {
   device_name?: string;
   device_minorType: string;
-  device_isconnected: "Yes" | "No";
+  device_isconnected?: "Yes" | "No";
   device_address: string;
 }
 
@@ -44,9 +44,6 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
     processDeviceList(bluetoothInfo.device_not_connected, false);
 
     const devices = Array.from(deviceMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-
-    console.log("Found connected devices:", devices.filter((d) => d.connected).length);
-    console.log("Found disconnected devices:", devices.filter((d) => !d.connected).length);
 
     return devices;
   } catch (error) {
