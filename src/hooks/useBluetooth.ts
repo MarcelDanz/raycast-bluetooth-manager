@@ -44,7 +44,7 @@ export function useBluetooth() {
     setIsLoading(true);
     setError(null);
 
-    exec("system_profiler SPBluetoothDataType -json", (err, stdout) => {
+    exec("/usr/sbin/system_profiler SPBluetoothDataType -json", (err, stdout) => {
       try {
         if (err) {
           throw err;
