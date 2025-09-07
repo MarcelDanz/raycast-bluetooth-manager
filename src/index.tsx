@@ -2,7 +2,7 @@ import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@rayca
 import { exec } from "child_process";
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
-import { isBlueutilInstalled } from "./utils";
+import { findBlueutilPath } from "./utils";
 
 const getDeviceIcon = (minorType: string): Icon => {
   switch (minorType.toLowerCase()) {
@@ -22,10 +22,14 @@ const getDeviceIcon = (minorType: string): Icon => {
 };
 
 export default function Command() {
-  const [isInstalled, setIsInstalled] = useState<boolean | null>(null);
+  const [blueutilPath, setBlueutilPath] = useState<string | null>(null);
+  const [isPathLoading, setIsPathLoading] = useState(true);
 
   useEffect(() => {
-    isBlueutilInstalled().then(setIsInstalled);
+    findBlueutilPath().then((path) => {
+      setBlueutilPath(path);
+      setIsPathLoading(false);
+    });
   }, []);
 
   const { devices, error, isLoading, revalidate } = useBluetooth();
@@ -54,6 +58,15 @@ export default function Command() {
   };
 
   async function handleToggleConnection(address: string, isConnected: boolean) {
+    if (!blueutilPath) {
+      showToast({
+        style: Toast.Style.Failure,
+        title: "blueutil not found",
+        message: "Please ensure blueutil is installed and in your PATH.",
+      });
+      return;
+    }
+
     const toast = await showToast({
       style: Toast.Style.Animated,
       title: "Toggling connection...",
@@ -61,7 +74,7 @@ export default function Command() {
 
     try {
       const action = isConnected ? "disconnect" : "connect";
-      exec(`blueutil --${action} ${address}`, (error, stdout, stderr) => {
+      exec(`"${blueutilPath}" --${action} ${address}`, (error, stdout, stderr) => {
         if (error || stderr) {
           toast.style = Toast.Style.Failure;
           toast.title = "Failed to toggle connection";
@@ -84,11 +97,11 @@ export default function Command() {
     }
   }
 
-  if (isInstalled === null) {
+  if (isPathLoading) {
     return <List isLoading={true} />;
   }
 
-  if (isInstalled === false) {
+  if (!blueutilPath) {
     return (
       <List>
         <List.EmptyView
