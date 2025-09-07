@@ -37,8 +37,23 @@ on run argv
 				try
 					set deviceMenuItem to menu item deviceName of menu 1 of btMenuBarItem
 
-					-- Just click the device menu item directly to toggle its connection status.
-					perform action "AXPress" of deviceMenuItem
+					set actionTaken to false
+					-- Try to find a connect/disconnect action in a submenu first. This is common for audio devices.
+					if exists (menu 1 of deviceMenuItem) then
+						if exists (menu item "Disconnect" of menu 1 of deviceMenuItem) then
+							perform action "AXPress" of menu item "Disconnect" of menu 1 of deviceMenuItem
+							set actionTaken to true
+						else if exists (menu item "Connect" of menu 1 of deviceMenuItem) then
+							perform action "AXPress" of menu item "Connect" of menu 1 of deviceMenuItem
+							set actionTaken to true
+						end if
+					end if
+
+					-- If no action was taken in a submenu, fall back to clicking the main item.
+					-- This works for devices like mice and keyboards.
+					if actionTaken is false then
+						perform action "AXPress" of deviceMenuItem
+					end if
 				on error
 					-- This error means the device item was not found.
 					-- Close the menu and report error.
