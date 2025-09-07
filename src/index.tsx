@@ -94,7 +94,7 @@ export default function Command() {
         <List.Item
           key={device.address}
           id={device.address}
-          title={{ value: device.name, tintColor: !device.connected ? Color.SecondaryText : undefined }}
+          title={device.name}
           icon={{ source: getDeviceIcon(device.minorType), tintColor: !device.connected ? Color.SecondaryText : undefined }}
           actions={
             <ActionPanel>
