@@ -34,6 +34,7 @@
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
+    "postinstall": "if ! command -v blueutil &> /dev/null; then echo 'blueutil not found, attempting to install via Homebrew...'; brew install blueutil; fi",
     "publish": "ray publish"
   }
 }
