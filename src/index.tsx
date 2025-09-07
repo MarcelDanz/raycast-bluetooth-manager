@@ -1,4 +1,5 @@
-import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Color, environment, Icon, List, showToast, Toast } from "@raycast/api";
+import { join } from "path";
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
 
@@ -52,9 +53,9 @@ export default function Command() {
     });
 
     try {
-      // This path assumes the script is in the `assets` directory at the root of the extension.
+      const scriptPath = join(environment.assetsPath, "toggle_connection.applescript");
       const { exec } = require("child_process");
-      exec(`osascript assets/toggle_connection.applescript "${deviceName}"`, (error, stdout, stderr) => {
+      exec(`osascript "${scriptPath}" "${deviceName}"`, (error, stdout, stderr) => {
         if (error || stderr) {
           toast.style = Toast.Style.Failure;
           toast.title = "Failed to toggle connection";
