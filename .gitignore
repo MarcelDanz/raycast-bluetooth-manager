@@ -11,7 +11,6 @@ out/
 coverage/
 *.log
 raycast-env.d.ts
-/test
 
 # misc
 .DS_Store
