@@ -43,7 +43,7 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
     processDeviceList(bluetoothInfo.device_connected, true);
     processDeviceList(bluetoothInfo.device_not_connected, false);
 
-    const devices = Array.from(deviceMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    const devices = Array.from(deviceMap.values());
 
     return devices;
   } catch (error) {
