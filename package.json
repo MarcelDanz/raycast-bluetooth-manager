@@ -1,40 +1,23 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "people-directory",
-  "title": "People Directory",
-  "description": "A detailed employee directory for your company",
+  "name": "bluetooth-manager",
+  "title": "Bluetooth Manager",
+  "description": "Connect and disconnect bluetooth devices.",
   "icon": "icon.png",
   "author": "thomas",
   "categories": [
-    "Communication"
+    "System"
   ],
   "license": "MIT",
   "commands": [
     {
-      "name": "search-people",
-      "title": "Search People",
-      "description": "Search employees of your company",
+      "name": "index",
+      "title": "Manage Bluetooth Devices",
+      "description": "Connect and disconnect bluetooth devices",
       "mode": "view"
     }
   ],
-  "preferences": [
-    {
-      "type": "password",
-      "name": "apiToken",
-      "title": "API Token",
-      "description": "API Token for Notion's API",
-      "required": true
-    },
-    {
-      "type": "textfield",
-      "name": "databaseId",
-      "title": "Database ID",
-      "description": "Database ID of your People Directory",
-      "required": true
-    }
-  ],
   "dependencies": {
-    "@notionhq/client": "^2.2.1",
     "@raycast/api": "^1.40.0",
     "@raycast/utils": "^1.4.8"
   },
