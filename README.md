@@ -4,9 +4,12 @@ A Raycast extension to quickly connect and disconnect your Bluetooth devices dir
 
 ## Requirements
 
-This extension requires `blueutil`, a command-line utility to control Bluetooth connections on macOS.
+This extension requires `blueutil` installed through `homebrew`, a command-line utility to control Bluetooth connections on macOS.
 
-To use this extension, you must have [Homebrew](https://brew.sh/) installed. The first time you run `npm install` for this extension, it will automatically attempt to install `blueutil` for you using Homebrew.
+Install with:
+```bash
+    > brew install blueutil
+```
 
 ## Features
 
