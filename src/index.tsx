@@ -69,7 +69,7 @@ export default function Command() {
 
     // Optimistically update the UI
     setDevices((prevDevices) =>
-      prevDevices.map((d) => (d.address === address ? { ...d, connected: !isConnected } : d))
+      prevDevices.map((d) => (d.address === address ? { ...d, connected: !isConnected } : d)),
     );
 
     const actionVerb = isConnected ? "Disconnecting" : "Connecting";
@@ -140,7 +140,10 @@ export default function Command() {
           key={device.address}
           id={device.address}
           title={device.name}
-          icon={{ source: getDeviceIcon(device.minorType), tintColor: !device.connected ? Color.SecondaryText : undefined }}
+          icon={{
+            source: getDeviceIcon(device.minorType),
+            tintColor: !device.connected ? Color.SecondaryText : undefined,
+          }}
           actions={
             <ActionPanel>
               <Action
