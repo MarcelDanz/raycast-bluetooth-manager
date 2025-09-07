@@ -37,26 +37,8 @@ on run argv
 				try
 					set deviceMenuItem to menu item deviceName of menu 1 of btMenuBarItem
 
-					set actionName to missing value
-					if exists (menu 1 of deviceMenuItem) then
-						-- Device with a submenu (e.g., headphones)
-						if exists (menu item "Disconnect" of menu 1 of deviceMenuItem) then
-							set actionName to "Disconnect"
-						else if exists (menu item "Connect" of menu 1 of deviceMenuItem) then
-							set actionName to "Connect"
-						end if
-
-						if actionName is not missing value then
-							perform action "AXPress" of menu item actionName of menu 1 of deviceMenuItem
-						else
-							-- Close the menu and report error
-							perform action "AXPress" of btMenuBarItem
-							return "Error: Found device '" & deviceName & "' but no Connect/Disconnect action in its submenu."
-						end if
-					else
-						-- Simpler device, clicking the item itself might toggle it.
-						perform action "AXPress" of deviceMenuItem
-					end if
+					-- Just click the device menu item directly to toggle its connection status.
+					perform action "AXPress" of deviceMenuItem
 				on error
 					-- This error means the device item was not found.
 					-- Close the menu and report error.
