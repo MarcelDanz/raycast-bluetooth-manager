@@ -1,84 +1,34 @@
-import { exec } from "child_process";
 import { useState, useEffect, useCallback } from "react";
+import * as blueutil from "blueutil";
 import { BluetoothDevice } from "../types";
-
-interface SystemProfilerOutput {
-  SPBluetoothDataType: {
-    device_connected?: Record<string, DeviceInfo>[];
-    device_not_connected?: Record<string, DeviceInfo>[];
-  }[];
-}
-
-interface DeviceInfo {
-  device_name?: string;
-  device_minorType: string;
-  device_isconnected?: "Yes" | "No";
-  device_address: string;
-}
-
-const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
-  try {
-    const data = JSON.parse(jsonOutput) as SystemProfilerOutput;
-    const bluetoothInfo = data.SPBluetoothDataType[0];
-    if (!bluetoothInfo) return [];
-
-    const deviceMap = new Map<string, BluetoothDevice>();
-
-    const processDeviceList = (list: Record<string, DeviceInfo>[] | undefined, connected: boolean) => {
-      if (!list) return;
-      list
-        .flatMap((deviceObject) => Object.entries(deviceObject))
-        .forEach(([nameFromKey, info]) => {
-          if (info.device_address && !deviceMap.has(info.device_address)) {
-            deviceMap.set(info.device_address, {
-              name: info.device_name || nameFromKey,
-              address: info.device_address,
-              connected: connected,
-              minorType: info.device_minorType,
-            });
-          }
-        });
-    };
-
-    processDeviceList(bluetoothInfo.device_connected, true);
-    processDeviceList(bluetoothInfo.device_not_connected, false);
-
-    const devices = Array.from(deviceMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-
-    return devices;
-  } catch (error) {
-    console.error("Failed to parse bluetooth data:", error);
-    // Rethrow to be caught by the caller
-    throw new Error("Could not parse JSON from system_profiler");
-  }
-};
 
 export function useBluetooth() {
   const [devices, setDevices] = useState<BluetoothDevice[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchDevices = useCallback(() => {
-    setIsLoading(true);
-    setError(null);
+  const fetchDevices = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-    exec("/usr/sbin/system_profiler SPBluetoothDataType -json", (err, stdout) => {
-      try {
-        if (err) {
-          throw err;
-        }
+      const blueutilDevices = await blueutil.list();
 
-        const parsedDevices = parseOutput(stdout);
+      const devices = blueutilDevices
+        .map((d) => ({
+          name: d.name,
+          address: d.address,
+          connected: d.connected,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-        setDevices(parsedDevices);
-      } catch (e) {
-        setError(e as Error);
-        // Clear devices on error
-        setDevices([]);
-      } finally {
-        setIsLoading(false);
-      }
-    });
+      setDevices(devices);
+    } catch (e) {
+      setError(e as Error);
+      setDevices([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {

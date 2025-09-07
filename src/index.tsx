@@ -1,24 +1,7 @@
-import { Action, ActionPanel, Color, environment, Icon, List, showToast, Toast } from "@raycast/api";
-import { join } from "path";
+import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
+import * as blueutil from "blueutil";
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
-
-const getDeviceIcon = (minorType: string): Icon => {
-  switch (minorType.toLowerCase()) {
-    case "keyboard":
-      return Icon.Keyboard;
-    case "mouse":
-      return Icon.Mouse;
-    case "headset":
-    case "headphones":
-    case "earbuds":
-      return Icon.Headphones;
-    case "gamepad":
-      return Icon.GameController;
-    default:
-      return Icon.Bluetooth;
-  }
-};
 
 export default function Command() {
   const { devices, error, isLoading, revalidate } = useBluetooth();
@@ -53,26 +36,19 @@ export default function Command() {
     });
 
     try {
-      const blueutilPath = join(environment.assetsPath, "blueutil");
-      const action = isConnected ? "--disconnect" : "--connect";
-      const { exec } = require("child_process");
+      if (isConnected) {
+        await blueutil.disconnect(address);
+      } else {
+        await blueutil.connect(address);
+      }
 
-      exec(`"${blueutilPath}" ${action} ${address}`, (error, stdout, stderr) => {
-        if (error || stderr) {
-          toast.style = Toast.Style.Failure;
-          toast.title = "Failed to toggle connection";
-          toast.message = stderr || error?.message;
-          return;
-        }
+      toast.style = Toast.Style.Success;
+      toast.title = "Connection toggled";
 
-        toast.style = Toast.Style.Success;
-        toast.title = "Connection toggled";
-
-        // Refresh the list after a short delay to allow the connection state to update
-        setTimeout(() => {
-          revalidate();
-        }, 1000);
-      });
+      // Refresh the list after a short delay to allow the connection state to update
+      setTimeout(() => {
+        revalidate();
+      }, 1000);
     } catch (err) {
       toast.style = Toast.Style.Failure;
       toast.title = "Error";
@@ -98,7 +74,7 @@ export default function Command() {
           key={device.address}
           id={device.address}
           title={device.name}
-          icon={{ source: getDeviceIcon(device.minorType), tintColor: !device.connected ? Color.SecondaryText : undefined }}
+          icon={{ source: Icon.Bluetooth, tintColor: !device.connected ? Color.SecondaryText : undefined }}
           actions={
             <ActionPanel>
               <Action
