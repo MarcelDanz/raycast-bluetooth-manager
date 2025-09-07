@@ -71,13 +71,7 @@ export function useBluetooth() {
           throw err;
         }
 
-        console.log("--- Raw system_profiler output ---");
-        console.log(stdout);
-
         const parsedDevices = parseOutput(stdout);
-
-        console.log("--- Parsed devices ---");
-        console.log(parsedDevices);
 
         setDevices(parsedDevices);
       } catch (e) {
