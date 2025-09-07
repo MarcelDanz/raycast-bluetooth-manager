@@ -112,14 +112,13 @@ export default function Command() {
               <Action
                 title={device.connected ? "Disconnect" : "Connect"}
                 onAction={() => handleToggleConnection(device.name)}
-                shortcut={{ modifiers: ["cmd"], key: "enter" }}
               />
               <Action title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["cmd"], key: "r" }} />
               <Action
                 title="Select Previous Item"
                 icon={Icon.ChevronUp}
                 onAction={selectPreviousItem}
-                shortcut={{ modifiers: ["cmd"], key: "h" }}
+                shortcut={{ modifiers: ["ctrl"], key: "h" }}
               />
               <Action
                 title="Select Next Item"
