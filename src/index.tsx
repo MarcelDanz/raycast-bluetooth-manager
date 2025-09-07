@@ -32,7 +32,7 @@ export default function Command() {
     });
   }, []);
 
-  const { devices, error, isLoading, revalidate } = useBluetooth();
+  const { devices, error, isLoading, revalidate, setDevices } = useBluetooth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -67,6 +67,11 @@ export default function Command() {
       return;
     }
 
+    // Optimistically update the UI
+    setDevices((prevDevices) =>
+      prevDevices.map((d) => (d.address === address ? { ...d, connected: !isConnected } : d))
+    );
+
     const actionVerb = isConnected ? "Disconnecting" : "Connecting";
 
     const toast = await showToast({
@@ -81,13 +86,14 @@ export default function Command() {
           toast.style = Toast.Style.Failure;
           toast.title = `Failed to ${action}`;
           toast.message = stderr || error?.message;
+          revalidate(); // Revert optimistic update on failure
           return;
         }
 
         toast.style = Toast.Style.Success;
         toast.title = `${actionVerb.replace("ing", "ed")}`;
 
-        // Refresh the list after a short delay to allow the connection state to update
+        // Re-fetch from source of truth to ensure consistency
         setTimeout(() => {
           revalidate();
         }, 1000);
@@ -96,6 +102,7 @@ export default function Command() {
       toast.style = Toast.Style.Failure;
       toast.title = "Error";
       toast.message = err instanceof Error ? err.message : "Unknown error";
+      revalidate(); // Revert optimistic update on failure
     }
   }
 

@@ -82,5 +82,5 @@ export function useBluetooth() {
     fetchDevices();
   }, []);
 
-  return { devices, error, isLoading, revalidate: fetchDevices };
+  return { devices, error, isLoading, revalidate: fetchDevices, setDevices };
 }
