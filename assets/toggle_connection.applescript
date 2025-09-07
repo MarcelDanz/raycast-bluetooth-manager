@@ -5,45 +5,73 @@ on run argv
 	if (count of argv) is 0 then
 		return "Error: No device name provided."
 	end if
-
 	set deviceName to item 1 of argv
-	
+
 	tell application "System Events"
+		if UI elements enabled is false then
+			return "Error: Accessibility permissions are not enabled. Please grant Raycast accessibility permissions in System Settings."
+		end if
+
+		set targetProcess to missing value
+		if exists process "ControlCenter" then
+			set targetProcess to process "ControlCenter"
+		else if exists process "SystemUIServer" then
+			set targetProcess to process "SystemUIServer"
+		else
+			return "Error: Could not find a UI process (ControlCenter or SystemUIServer) to script."
+		end if
+
 		try
-			tell process "ControlCenter"
-				set btMenuBarItem to menu bar item "Bluetooth" of menu bar 1
-				click btMenuBarItem
-				
-				# Wait for the menu to appear
-				delay 0.5
-				
-				# Find the menu item for the device.
-				set deviceMenuItem to menu item deviceName of menu 1 of btMenuBarItem
-				
-				# Most devices have a submenu with actions.
-				if exists (menu 1 of deviceMenuItem) then
-					if exists (menu item "Disconnect" of menu 1 of deviceMenuItem) then
-						click menu item "Disconnect" of menu 1 of deviceMenuItem
-					else if exists (menu item "Connect" of menu 1 of deviceMenuItem) then
-						click menu item "Connect" of menu 1 of deviceMenuItem
-					else
-						click btMenuBarItem -- Close menu
-						return "Error: Found device but no Connect/Disconnect action."
-					end if
-				else
-					# For simpler devices, clicking the item itself might toggle connection.
-					click deviceMenuItem
+			tell targetProcess
+				set menuBar to menu bar 1
+				set btMenuBarItems to (menu bar items of menuBar where description is "Bluetooth")
+
+				if (count of btMenuBarItems) is 0 then
+					return "Error: Bluetooth menu bar item not found. Please ensure it is visible in the menu bar."
 				end if
-				
+				set btMenuBarItem to item 1 of btMenuBarItems
+
+				perform action "AXPress" of btMenuBarItem
+				delay 0.5 -- Wait for menu to open
+
+				try
+					set deviceMenuItem to menu item deviceName of menu 1 of btMenuBarItem
+
+					set actionName to missing value
+					if exists (menu 1 of deviceMenuItem) then
+						-- Device with a submenu (e.g., headphones)
+						if exists (menu item "Disconnect" of menu 1 of deviceMenuItem) then
+							set actionName to "Disconnect"
+						else if exists (menu item "Connect" of menu 1 of deviceMenuItem) then
+							set actionName to "Connect"
+						end if
+
+						if actionName is not missing value then
+							perform action "AXPress" of menu item actionName of menu 1 of deviceMenuItem
+						else
+							-- Close the menu and report error
+							perform action "AXPress" of btMenuBarItem
+							return "Error: Found device '" & deviceName & "' but no Connect/Disconnect action in its submenu."
+						end if
+					else
+						-- Simpler device, clicking the item itself might toggle it.
+						perform action "AXPress" of deviceMenuItem
+					end if
+				on error
+					-- This error means the device item was not found.
+					-- Close the menu and report error.
+					perform action "AXPress" of btMenuBarItem
+					return "Error: Device '" & deviceName & "' not found in the Bluetooth menu."
+				end try
 			end tell
 		on error errMsg
-			# Ensure the menu is closed if an error occurs
+			-- If an error happens, try to close the Bluetooth menu before quitting.
 			try
-				tell application "System Events" to tell process "ControlCenter" to click menu bar item "Bluetooth" of menu bar 1
+				tell targetProcess to perform action "AXPress" of (item 1 of (menu bar items of menu bar 1 where description is "Bluetooth"))
 			end try
 			return "AppleScript Error: " & errMsg
 		end try
 	end tell
-	
+
 	return "Toggled connection for " & deviceName
 end run
