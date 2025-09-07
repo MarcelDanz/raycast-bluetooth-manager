@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
 
@@ -94,12 +94,8 @@ export default function Command() {
         <List.Item
           key={device.address}
           id={device.address}
-          title={device.name}
-          icon={
-            device.connected
-              ? { source: getDeviceIcon(device.minorType), tintColor: "raycast-green" }
-              : getDeviceIcon(device.minorType)
-          }
+          title={{ value: device.name, tintColor: !device.connected ? Color.SecondaryText : undefined }}
+          icon={{ source: getDeviceIcon(device.minorType), tintColor: !device.connected ? Color.SecondaryText : undefined }}
           actions={
             <ActionPanel>
               <Action
