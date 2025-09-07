@@ -4,9 +4,8 @@ import { BluetoothDevice } from "../types";
 
 interface SystemProfilerOutput {
   SPBluetoothDataType: {
-    devices_list?: Record<string, DeviceInfo>[];
-    device_connected_list?: Record<string, DeviceInfo>[];
-    device_not_connected_list?: Record<string, DeviceInfo>[];
+    device_connected?: Record<string, DeviceInfo>[];
+    device_not_connected?: Record<string, DeviceInfo>[];
   }[];
 }
 
@@ -25,9 +24,8 @@ const parseOutput = (jsonOutput: string): BluetoothDevice[] => {
 
     // Collect all devices from various possible keys
     const allDeviceLists: Record<string, DeviceInfo>[] = [
-      ...(bluetoothInfo.devices_list || []),
-      ...(bluetoothInfo.device_connected_list || []),
-      ...(bluetoothInfo.device_not_connected_list || []),
+      ...(bluetoothInfo.device_connected || []),
+      ...(bluetoothInfo.device_not_connected || []),
     ];
 
     if (allDeviceLists.length === 0) {
