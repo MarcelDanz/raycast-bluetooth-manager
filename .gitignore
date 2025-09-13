@@ -17,3 +17,4 @@ raycast-env.d.ts
 ..idea/
 .vscode/
 aider*
+.aider*
