@@ -26,7 +26,7 @@ export function useBluetoothDiscovery() {
     exec(`"${blueutilPath}" --inquiry`, (err, stdout, stderr) => {
       setIsLoading(false);
       if (err || stderr) {
-        setError(new Error(stderr || err.message));
+        setError(new Error(stderr || err?.message));
         return;
       }
 
