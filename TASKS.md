@@ -35,12 +35,11 @@ This feature will add an option to unpair (or "forget") a Bluetooth device direc
 
 ### 1.4. State Management and Feedback
 
--   Upon initiating the action, show an animated `Toast` saying "Forgetting 'Device Name'...".
+-   Upon initiating the action, set the list to a loading state to show activity in the status bar. A new state, e.g., `isUnpairing`, will be managed.
 -   Upon successful unpairing:
-    -   Update the toast to show success: "'Device Name' has been forgotten."
-    -   Call `revalidate()` from the `useBluetooth` hook to refresh the device list. The forgotten device should disappear.
+    -   Call `revalidate()` from the `useBluetooth` hook to refresh the device list. The device disappearing from the list serves as success feedback.
 -   If the unpairing command fails:
-    -   Update the toast to show failure with an informative error message.
+    -   Show a failure `Toast` with an informative error message. This is recommended as there is no other non-intrusive UI element to display a contextual error for a failed action.
 
 ### 1.5. File-by-File Changes
 
@@ -92,12 +91,11 @@ This feature will add a new Raycast command to discover and pair new Bluetooth d
 ### 2.5. State Management and Feedback
 
 -   During pairing:
-    -   Show an `Animated` `Toast` with the title "Pairing with 'Device Name'...".
+    -   Set the list to a loading state to show activity in the status bar.
 -   Upon successful pairing:
-    -   Update the toast to success: "Successfully paired with 'Device Name'".
-    -   Automatically close the command window using `popToRoot` so the user can immediately see the newly paired device in the main "Manage Bluetooth Devices" list.
+    -   Automatically close the command window using `popToRoot`. The user will see the newly paired device in the main "Manage Bluetooth Devices" list upon its next refresh.
 -   If pairing fails:
-    -   Update the toast to failure, showing an error message from `blueutil`.
+    -   Show a failure `Toast` with an informative error message from `blueutil`. This is the clearest way to communicate the error to the user without disrupting the view.
 
 ### 2.6. File-by-File Changes
 
