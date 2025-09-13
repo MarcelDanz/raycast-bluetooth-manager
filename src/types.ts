@@ -4,3 +4,8 @@ export interface BluetoothDevice {
   connected: boolean;
   minorType: string;
 }
+
+export interface DiscoveredBluetoothDevice {
+  name: string;
+  address: string;
+}

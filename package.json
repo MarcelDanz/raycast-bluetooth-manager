@@ -25,6 +25,12 @@
       "title": "Manage Bluetooth Devices",
       "description": "Connect and disconnect bluetooth devices",
       "mode": "view"
+    },
+    {
+      "name": "pair-device",
+      "title": "Pair New Bluetooth Device",
+      "description": "Scans for and pairs with new Bluetooth devices",
+      "mode": "view"
     }
   ],
   "dependencies": {
