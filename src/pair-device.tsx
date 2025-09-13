@@ -1,6 +1,6 @@
-import { Action, ActionPanel, Icon, List, showToast, Toast, popToRoot, Color, hideToast } from "@raycast/api";
+import { Action, ActionPanel, Icon, List, showToast, Toast, popToRoot, Color } from "@raycast/api";
 import { exec } from "child_process";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useBluetoothDiscovery } from "./hooks/useBluetoothDiscovery";
 import { useBluetooth } from "./hooks/useBluetooth";
 
@@ -9,15 +9,22 @@ export default function Command() {
   const { devices: pairedDevices } = useBluetooth();
   const [isPairing, setIsPairing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const scanToast = useRef<Toast | null>(null);
 
   const pairedDeviceAddresses = new Set(pairedDevices.map((d) => d.address));
 
   useEffect(() => {
-    if (isLoading) {
-      showToast({ style: Toast.Style.Animated, title: "Scanning for devices..." });
-    } else {
-      hideToast();
+    async function manageToast() {
+      if (isLoading) {
+        scanToast.current = await showToast({ style: Toast.Style.Animated, title: "Scanning for devices..." });
+      } else {
+        if (scanToast.current) {
+          scanToast.current.hide();
+          scanToast.current = null;
+        }
+      }
     }
+    manageToast();
   }, [isLoading]);
 
   useEffect(() => {
@@ -119,11 +126,9 @@ export default function Command() {
             icon={{ source: Icon.Bluetooth, tintColor: isPaired ? Color.SecondaryText : undefined }}
             actions={
               <ActionPanel>
-                <Action
-                  title="Pair Device"
-                  onAction={() => handlePairDevice(device.address, device.name)}
-                  disabled={isPaired}
-                />
+                {!isPaired && (
+                  <Action title="Pair Device" onAction={() => handlePairDevice(device.address, device.name)} />
+                )}
                 <Action title="Rescan" onAction={revalidate} shortcut={{ modifiers: [], key: "r" }} />
                 <Action
                   title="Select Previous Item"
