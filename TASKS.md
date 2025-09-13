@@ -81,6 +81,9 @@ This feature will add a new Raycast command to discover and pair new Bluetooth d
     -   Each `List.Item` will represent a discoverable device, showing its name and address.
     -   The view should handle the `isLoading` state, showing a message like "Scanning for devices...".
 -   Each list item will have an `ActionPanel` with a primary action: "Pair Device".
+-   Implement list navigation actions similar to the main command:
+    -   "Select Next Item" with shortcut `Cmd`+`Ctrl`+`J`.
+    -   "Select Previous Item" with shortcut `Cmd`+`Ctrl`+`K`.
 
 ### 2.4. Pairing Logic
 
