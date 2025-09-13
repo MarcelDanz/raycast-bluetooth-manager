@@ -40,27 +40,33 @@ export default function Command() {
       return;
     }
 
+    const toast = await showToast({
+      style: Toast.Style.Animated,
+      title: `Pairing with ${name}...`,
+    });
+
     setIsPairing(true);
     try {
       exec(`"${blueutilPath}" --pair ${address}`, (err, stdout, stderr) => {
         setIsPairing(false);
         if (err || (stderr && stderr.includes("Failed"))) {
-          showToast({
-            style: Toast.Style.Failure,
-            title: `Failed to pair with ${name}`,
-            message: stderr || err?.message,
-          });
+          toast.style = Toast.Style.Failure;
+          toast.title = `Failed to pair with ${name}`;
+          toast.message = stderr || err?.message;
+          revalidate();
           return;
         }
-        popToRoot({ clearSearchBar: true });
+
+        toast.style = Toast.Style.Success;
+        toast.title = `Paired with ${name}`;
+        revalidate();
       });
     } catch (err) {
       setIsPairing(false);
-      showToast({
-        style: Toast.Style.Failure,
-        title: "Error",
-        message: err instanceof Error ? err.message : "Unknown error",
-      });
+      toast.style = Toast.Style.Failure;
+      toast.title = "Error";
+      toast.message = err instanceof Error ? err.message : "Unknown error";
+      revalidate();
     }
   }
 
@@ -100,7 +106,7 @@ export default function Command() {
           actions={
             <ActionPanel>
               <Action title="Pair Device" onAction={() => handlePairDevice(device.address, device.name)} />
-              <Action title="Rescan" onAction={revalidate} shortcut={{ modifiers: ["cmd"], key: "r" }} />
+              <Action title="Rescan" onAction={revalidate} shortcut={{ modifiers: [], key: "r" }} />
               <Action
                 title="Select Previous Item"
                 icon={Icon.ChevronUp}
