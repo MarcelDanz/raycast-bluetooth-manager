@@ -151,6 +151,7 @@ export default function Command() {
         toast.style = Toast.Style.Failure;
         toast.title = "Error";
         toast.message = err instanceof Error ? err.message : "Unknown error";
+        revalidate();
       }
     }
   }
