@@ -125,28 +125,32 @@ export default function Command() {
         return;
       }
 
+      const toast = await showToast({
+        style: Toast.Style.Animated,
+        title: `Forgetting ${name}...`,
+      });
+
       setIsForgetting(true);
       try {
         exec(`"${blueutilPath}" --unpair ${address}`, (error, stdout, stderr) => {
           setIsForgetting(false);
           if (error || stderr) {
-            showToast({
-              style: Toast.Style.Failure,
-              title: `Failed to forget ${name}`,
-              message: stderr || error?.message,
-            });
+            toast.style = Toast.Style.Failure;
+            toast.title = `Failed to forget ${name}`;
+            toast.message = stderr || error?.message;
             revalidate();
             return;
           }
+
+          toast.style = Toast.Style.Success;
+          toast.title = `Forgot ${name}`;
           setTimeout(() => revalidate(), 1000);
         });
       } catch (err) {
         setIsForgetting(false);
-        showToast({
-          style: Toast.Style.Failure,
-          title: "Error",
-          message: err instanceof Error ? err.message : "Unknown error",
-        });
+        toast.style = Toast.Style.Failure;
+        toast.title = "Error";
+        toast.message = err instanceof Error ? err.message : "Unknown error";
       }
     }
   }
