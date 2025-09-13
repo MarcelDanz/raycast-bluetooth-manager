@@ -129,15 +129,16 @@ export default function Command() {
       try {
         exec(`"${blueutilPath}" --unpair ${address}`, (error, stdout, stderr) => {
           setIsForgetting(false);
-          if (error || (stderr && stderr.includes("Failed"))) {
+          if (error || stderr) {
             showToast({
               style: Toast.Style.Failure,
               title: `Failed to forget ${name}`,
               message: stderr || error?.message,
             });
+            revalidate();
             return;
           }
-          revalidate();
+          setTimeout(() => revalidate(), 1000);
         });
       } catch (err) {
         setIsForgetting(false);
