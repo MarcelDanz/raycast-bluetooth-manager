@@ -17,7 +17,7 @@ This feature will add an option to unpair (or "forget") a Bluetooth device direc
 -   Use a destructive style: `style: Action.Style.Destructive`.
 -   Use an appropriate icon, like `Icon.Trash`.
 -   This action should be placed in its own `<ActionPanel.Section>` to separate it from the primary connection action.
--   Assign a keyboard shortcut, for example `Cmd`+`Shift`+`D`.
+-   Assign a keyboard shortcut, `x`.
 
 ### 1.2. Confirmation Dialog
 
