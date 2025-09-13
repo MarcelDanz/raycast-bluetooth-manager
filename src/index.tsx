@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Alert, Color, Icon, List, showToast, Toast, confirmAlert } from "@raycast/api";
 import { exec } from "child_process";
 import { useEffect, useState } from "react";
 import { useBluetooth } from "./hooks/useBluetooth";
@@ -33,6 +33,7 @@ export default function Command() {
   }, []);
 
   const { devices, error, isLoading, revalidate, setDevices } = useBluetooth();
+  const [isForgetting, setIsForgetting] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -106,6 +107,49 @@ export default function Command() {
     }
   }
 
+  async function handleForgetDevice(address: string, name: string) {
+    if (
+      await confirmAlert({
+        title: `Forget ${name}?`,
+        message: "This device will be unpaired. You may need to pair it again to reconnect.",
+        icon: Icon.Trash,
+        primaryAction: { title: "Forget Device", style: Alert.ActionStyle.Destructive },
+      })
+    ) {
+      if (!blueutilPath) {
+        showToast({
+          style: Toast.Style.Failure,
+          title: "blueutil not found",
+          message: "Please ensure blueutil is installed and in your PATH.",
+        });
+        return;
+      }
+
+      setIsForgetting(true);
+      try {
+        exec(`"${blueutilPath}" --unpair ${address}`, (error, stdout, stderr) => {
+          setIsForgetting(false);
+          if (error || (stderr && stderr.includes("Failed"))) {
+            showToast({
+              style: Toast.Style.Failure,
+              title: `Failed to forget ${name}`,
+              message: stderr || error?.message,
+            });
+            return;
+          }
+          revalidate();
+        });
+      } catch (err) {
+        setIsForgetting(false);
+        showToast({
+          style: Toast.Style.Failure,
+          title: "Error",
+          message: err instanceof Error ? err.message : "Unknown error",
+        });
+      }
+    }
+  }
+
   if (isPathLoading) {
     return <List isLoading={true} />;
   }
@@ -124,7 +168,7 @@ export default function Command() {
 
   return (
     <List
-      isLoading={isLoading}
+      isLoading={isLoading || isForgetting}
       selectedItemId={selectedId || undefined}
       onSelectionChange={(id) => {
         id && setSelectedId(id);
@@ -150,6 +194,15 @@ export default function Command() {
                 title={device.connected ? "Disconnect" : "Connect"}
                 onAction={() => handleToggleConnection(device.address, device.connected)}
               />
+              <ActionPanel.Section>
+                <Action
+                  title="Forget Device"
+                  style={Action.Style.Destructive}
+                  icon={Icon.Trash}
+                  onAction={() => handleForgetDevice(device.address, device.name)}
+                  shortcut={{ key: "x" }}
+                />
+              </ActionPanel.Section>
               <Action title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["cmd"], key: "r" }} />
               <Action
                 title="Select Previous Item"
