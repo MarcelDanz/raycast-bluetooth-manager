@@ -16,6 +16,8 @@ Install with:
 - **List Devices**: View all paired Bluetooth devices at a glance.
 - **Connection Status**: Instantly see which devices are connected or disconnected.
 - **Toggle Connection**: Connect or disconnect any device with a single action (`↵`).
+- **Forget Device**: Unpair a device with a destructive action (`x`).
+- **Pair New Device**: A separate command to scan for, pair, and connect to new devices.
 - **Smart Ranking**: Raycast automatically learns which devices you use most and ranks them higher in the list.
 - **Keyboard Navigation**: Use `Cmd`+`Ctrl`+`J` and `Cmd`+`Ctrl`+`K` to navigate the list.
 
