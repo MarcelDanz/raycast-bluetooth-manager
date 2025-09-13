@@ -200,7 +200,7 @@ export default function Command() {
                   style={Action.Style.Destructive}
                   icon={Icon.Trash}
                   onAction={() => handleForgetDevice(device.address, device.name)}
-                  shortcut={{ key: "x" }}
+                  shortcut={{ modifiers: [], key: "x" }}
                 />
               </ActionPanel.Section>
               <Action title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["cmd"], key: "r" }} />
