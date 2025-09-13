@@ -61,6 +61,7 @@ This feature will add a new Raycast command to discover and pair new Bluetooth d
     -   `title`: "Pair New Bluetooth Device"
     -   `description`: "Scans for and pairs with new Bluetooth devices."
     -   `mode`: `view`
+    -   Add a keyboard shortcut, for example `Cmd+Shift+P`.
 -   Create a new source file for this command: `src/pair-device.tsx`.
 
 ### 2.2. Device Discovery Logic
