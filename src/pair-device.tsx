@@ -1,12 +1,24 @@
-import { Action, ActionPanel, Icon, List, showToast, Toast, popToRoot } from "@raycast/api";
+import { Action, ActionPanel, Icon, List, showToast, Toast, popToRoot, Color, hideToast } from "@raycast/api";
 import { exec } from "child_process";
 import { useEffect, useState } from "react";
 import { useBluetoothDiscovery } from "./hooks/useBluetoothDiscovery";
+import { useBluetooth } from "./hooks/useBluetooth";
 
 export default function Command() {
   const { devices, error, isLoading, blueutilPath, revalidate } = useBluetoothDiscovery();
+  const { devices: pairedDevices } = useBluetooth();
   const [isPairing, setIsPairing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const pairedDeviceAddresses = new Set(pairedDevices.map((d) => d.address));
+
+  useEffect(() => {
+    if (isLoading) {
+      showToast({ style: Toast.Style.Animated, title: "Scanning for devices..." });
+    } else {
+      hideToast();
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (devices.length > 0 && !selectedId) {
@@ -96,33 +108,40 @@ export default function Command() {
         description={error ? error.message : "Make sure your device is in pairing mode and press ⌘+R to rescan."}
         icon={error ? Icon.XMarkCircle : Icon.Bluetooth}
       />
-      {devices.map((device) => (
-        <List.Item
-          key={device.address}
-          id={device.address}
-          title={device.name}
-          subtitle={device.address}
-          icon={Icon.Bluetooth}
-          actions={
-            <ActionPanel>
-              <Action title="Pair Device" onAction={() => handlePairDevice(device.address, device.name)} />
-              <Action title="Rescan" onAction={revalidate} shortcut={{ modifiers: [], key: "r" }} />
-              <Action
-                title="Select Previous Item"
-                icon={Icon.ChevronUp}
-                onAction={selectPreviousItem}
-                shortcut={{ modifiers: ["cmd", "ctrl"], key: "k" }}
-              />
-              <Action
-                title="Select Next Item"
-                icon={Icon.ChevronDown}
-                onAction={selectNextItem}
-                shortcut={{ modifiers: ["cmd", "ctrl"], key: "j" }}
-              />
-            </ActionPanel>
-          }
-        />
-      ))}
+      {devices.map((device) => {
+        const isPaired = pairedDeviceAddresses.has(device.address);
+        return (
+          <List.Item
+            key={device.address}
+            id={device.address}
+            title={device.name}
+            subtitle={isPaired ? `${device.address} (Paired)` : device.address}
+            icon={{ source: Icon.Bluetooth, tintColor: isPaired ? Color.SecondaryText : undefined }}
+            actions={
+              <ActionPanel>
+                <Action
+                  title="Pair Device"
+                  onAction={() => handlePairDevice(device.address, device.name)}
+                  disabled={isPaired}
+                />
+                <Action title="Rescan" onAction={revalidate} shortcut={{ modifiers: [], key: "r" }} />
+                <Action
+                  title="Select Previous Item"
+                  icon={Icon.ChevronUp}
+                  onAction={selectPreviousItem}
+                  shortcut={{ modifiers: ["cmd", "ctrl"], key: "k" }}
+                />
+                <Action
+                  title="Select Next Item"
+                  icon={Icon.ChevronDown}
+                  onAction={selectNextItem}
+                  shortcut={{ modifiers: ["cmd", "ctrl"], key: "j" }}
+                />
+              </ActionPanel>
+            }
+          />
+        );
+      })}
     </List>
   );
 }
