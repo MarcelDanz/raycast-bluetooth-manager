@@ -66,19 +66,31 @@ export default function Command() {
 
     setIsPairing(true);
     try {
-      exec(`"${blueutilPath}" --pair ${address}`, (err, stdout, stderr) => {
-        setIsPairing(false);
-        if (err || (stderr && stderr.includes("Failed"))) {
+      exec(`"${blueutilPath}" --pair ${address}`, (pairErr, pairStdout, pairStderr) => {
+        if (pairErr || (pairStderr && pairStderr.includes("Failed"))) {
+          setIsPairing(false);
           toast.style = Toast.Style.Failure;
           toast.title = `Failed to pair with ${name}`;
-          toast.message = stderr || err?.message;
+          toast.message = pairStderr || pairErr?.message;
           revalidate();
           return;
         }
 
-        toast.style = Toast.Style.Success;
-        toast.title = `Paired with ${name}`;
-        revalidate();
+        toast.style = Toast.Style.Animated;
+        toast.title = `Connecting to ${name}...`;
+
+        exec(`"${blueutilPath}" --connect ${address}`, (connectErr, connectStdout, connectStderr) => {
+          setIsPairing(false);
+          if (connectErr || connectStderr) {
+            toast.style = Toast.Style.Failure;
+            toast.title = `Paired, but failed to connect`;
+            toast.message = connectStderr || connectErr?.message;
+          } else {
+            toast.style = Toast.Style.Success;
+            toast.title = `Paired and connected to ${name}`;
+          }
+          revalidate();
+        });
       });
     } catch (err) {
       setIsPairing(false);
